@@ -44,5 +44,12 @@ Learning and experimentation workspace for integrating multiple AI tools (Claude
 ## Recent Learnings
 _Log insights here as you work_
 
+## Recent Milestones
+- **2025-11-19**: Multi-AI workspace operational - Claude Code, Gemini CLI, and Codex all authenticated and reading context files
+
+## Recent Milestones
+- **2025-11-19**: Multi-AI workspace operational - Claude Code, Gemini CLI, and Codex all authenticated and reading context files
+- **2025-11-19**: Implemented symlinks for context files - agents.md is master, claude.md and gemini.md are symbolic links for automatic synchronization
+
 ---
-**Synchronized across**: CLAUDE.md, Gemini.md, Agents.md
+**Implementation Note**: agents.md is the master file; claude.md and gemini.md are symbolic links
