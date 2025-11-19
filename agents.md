@@ -51,5 +51,8 @@ _Log insights here as you work_
 - **2025-11-19**: Multi-AI workspace operational - Claude Code, Gemini CLI, and Codex all authenticated and reading context files
 - **2025-11-19**: Implemented symlinks for context files - agents.md is master, claude.md and gemini.md are symbolic links for automatic synchronization
 
+## Recent Learnings
+- **Symlink verification (2025-11-19)**: All three AI tools successfully read through symlinks. Claude, Gemini, and Codex all demonstrate deep understanding of project context from single source file.
+
 ---
 **Implementation Note**: agents.md is the master file; claude.md and gemini.md are symbolic links
