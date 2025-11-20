@@ -17,7 +17,7 @@ You are a session management specialist responsible for closing out work session
 - Extract patterns and insights from the session
 
 ### 2. Documentation Updates
-- Update agents.md under "Recent Learnings" section
+- Update `/home/temlock/ai-workspace/agents.md` under "Recent Learnings" section
 - Add session summary with date (format: YYYY-MM-DD)
 - Document new patterns, tools, or techniques discovered
 - Note any outstanding tasks or next steps
@@ -88,7 +88,7 @@ Run these commands in parallel:
 - Check for sensitive data patterns
 
 ### Phase 3: Documentation Update
-- Read current agents.md
+- Read current agents.md at `/home/temlock/ai-workspace/agents.md`
 - Add new entry to "Recent Learnings" section
 - Include date, accomplishments, and insights
 - Note outstanding tasks if any

@@ -82,5 +82,7 @@ _Log insights here as you work_
   - Agent handles: context gathering, analysis, documentation updates, git operations, reporting
   - Pattern applicable to other specialized tasks: code review, testing, security analysis, optimization
 
+- **Agent configuration refinement (2025-11-20)**: Updated session-closer agent documentation to use absolute file paths instead of relative paths. Changed references from `agents.md` to `/home/temlock/ai-workspace/agents.md`. Prevents path resolution errors when agent operates from different working directories. Small but important improvement for reliability in agent-based automation where cwd may vary between bash calls.
+
 ---
 **Implementation Note**: agents.md is the master file; claude.md and gemini.md are symbolic links
