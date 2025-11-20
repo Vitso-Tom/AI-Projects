@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # system-check.sh - A colorful system health checker
 # Checks disk space, memory usage, and largest files
@@ -21,17 +22,60 @@ TR="╗"
 BL="╚"
 BR="╝"
 
+# Repeat a character N times without external utilities
+repeat_char() {
+    local char="$1"
+    local count=${2:-0}
+    if (( count <= 0 )); then
+        echo ""
+        return
+    fi
+    local line
+    printf -v line '%*s' "$count" ''
+    echo "${line// /$char}"
+}
+
+# Convert kibibytes to a human-readable unit with one decimal
+human_readable_kib() {
+    local kib=${1:-0}
+    if (( kib < 0 )); then
+        kib=0
+    fi
+    local units=(KiB MiB GiB TiB PiB)
+    local unit_index=0
+    local scaled=$((kib * 10))
+    while (( scaled >= 10240 && unit_index < ${#units[@]} - 1 )); do
+        scaled=$(( (scaled + 512) / 1024 ))
+        ((unit_index++))
+    done
+    local integer=$((scaled / 10))
+    local decimal=$((scaled % 10))
+    if (( decimal == 0 )); then
+        printf "%d %s" "$integer" "${units[unit_index]}"
+    else
+        printf "%d.%d %s" "$integer" "$decimal" "${units[unit_index]}"
+    fi
+}
+
 # Function to print a header box
 print_header() {
     local title="$1"
     local color="$2"
     local width=50
     local padding=$(( (width - ${#title} - 2) / 2 ))
+    (( padding < 0 )) && padding=0
+    local remainder=$((width - padding - ${#title} - 2))
+    (( remainder < 0 )) && remainder=0
+    local horizontal
+    horizontal=$(repeat_char "${HLINE}" "$width")
+    local left_pad right_pad
+    printf -v left_pad '%*s' "$padding" ''
+    printf -v right_pad '%*s' "$remainder" ''
 
     echo ""
-    echo -e "${color}${TL}$(printf '%0.s═' $(seq 1 $width))${TR}${NC}"
-    echo -e "${color}${VLINE}$(printf '%*s' $padding '')${WHITE} $title ${color}$(printf '%*s' $((width - padding - ${#title} - 2)) '')${VLINE}${NC}"
-    echo -e "${color}${BL}$(printf '%0.s═' $(seq 1 $width))${BR}${NC}"
+    echo -e "${color}${TL}${horizontal}${TR}${NC}"
+    echo -e "${color}${VLINE}${left_pad}${WHITE} $title ${color}${right_pad}${VLINE}${NC}"
+    echo -e "${color}${BL}${horizontal}${BR}${NC}"
 }
 
 # Function to colorize percentage based on value
@@ -89,14 +133,11 @@ echo -e "${WHITE}  Filesystem            Size    Used   Avail  Use%${NC}"
 echo -e "  ────────────────────────────────────────────────"
 
 # Get disk usage for main filesystems (excluding snap, tmpfs, etc.)
-df -h --output=source,size,used,avail,pcent 2>/dev/null | grep -E "^/dev/" | while read -r line; do
-    filesystem=$(echo "$line" | awk '{print $1}')
-    size=$(echo "$line" | awk '{print $2}')
-    used=$(echo "$line" | awk '{print $3}')
-    avail=$(echo "$line" | awk '{print $4}')
-    percent=$(echo "$line" | awk '{print $5}' | tr -d '%')
+while read -r filesystem size used avail percent; do
+    [[ -z "$filesystem" ]] && continue
+    [[ "$filesystem" != /dev/* ]] && continue
+    percent=${percent%%%}
 
-    # Truncate long filesystem names
     if [ ${#filesystem} -gt 18 ]; then
         filesystem="${filesystem:0:15}..."
     fi
@@ -105,7 +146,7 @@ df -h --output=source,size,used,avail,pcent 2>/dev/null | grep -E "^/dev/" | whi
     bar=$(progress_bar "$percent")
 
     printf "  ${CYAN}%-18s${NC} %6s  %6s  %6s  %s %s\n" "$filesystem" "$size" "$used" "$avail" "$colored_percent" "$bar"
-done
+done < <(df -h --output=source,size,used,avail,pcent 2>/dev/null | tail -n +2)
 
 # =============================================================================
 # MEMORY USAGE
@@ -114,17 +155,59 @@ print_header "MEMORY USAGE" "${MAGENTA}"
 
 echo ""
 
-# Get memory info
-mem_total=$(free -h | awk '/^Mem:/ {print $2}')
-mem_used=$(free -h | awk '/^Mem:/ {print $3}')
-mem_free=$(free -h | awk '/^Mem:/ {print $4}')
-mem_available=$(free -h | awk '/^Mem:/ {print $7}')
-mem_percent=$(free | awk '/^Mem:/ {printf "%.0f", $3/$2 * 100}')
+# Get memory info directly from /proc/meminfo
+mem_total_kb=0
+mem_free_kb=0
+mem_available_kb=-1
+buffers_kb=0
+cached_kb=0
+sreclaimable_kb=0
+shmem_kb=0
+swap_total_kb=0
+swap_free_kb=0
 
-swap_total=$(free -h | awk '/^Swap:/ {print $2}')
-swap_used=$(free -h | awk '/^Swap:/ {print $3}')
-swap_free=$(free -h | awk '/^Swap:/ {print $4}')
-swap_percent=$(free | awk '/^Swap:/ {if ($2 > 0) printf "%.0f", $3/$2 * 100; else print "0"}')
+while read -r key value _; do
+    key=${key%:}
+    case "$key" in
+        MemTotal) mem_total_kb=$value ;;
+        MemFree) mem_free_kb=$value ;;
+        MemAvailable) mem_available_kb=$value ;;
+        Buffers) buffers_kb=$value ;;
+        Cached) cached_kb=$value ;;
+        SReclaimable) sreclaimable_kb=$value ;;
+        Shmem) shmem_kb=$value ;;
+        SwapTotal) swap_total_kb=$value ;;
+        SwapFree) swap_free_kb=$value ;;
+    esac
+done < /proc/meminfo
+
+mem_cache_kb=$((cached_kb + sreclaimable_kb - shmem_kb))
+(( mem_cache_kb < 0 )) && mem_cache_kb=0
+mem_used_kb=$((mem_total_kb - mem_free_kb - buffers_kb - mem_cache_kb))
+(( mem_used_kb < 0 )) && mem_used_kb=0
+if (( mem_available_kb < 0 )); then
+    mem_available_kb=$((mem_free_kb + mem_cache_kb))
+fi
+
+mem_percent=0
+if (( mem_total_kb > 0 )); then
+    mem_percent=$(( (mem_used_kb * 100 + mem_total_kb / 2) / mem_total_kb ))
+fi
+
+swap_used_kb=$((swap_total_kb - swap_free_kb))
+(( swap_used_kb < 0 )) && swap_used_kb=0
+swap_percent=0
+if (( swap_total_kb > 0 )); then
+    swap_percent=$(( (swap_used_kb * 100 + swap_total_kb / 2) / swap_total_kb ))
+fi
+
+mem_total=$(human_readable_kib "$mem_total_kb")
+mem_used=$(human_readable_kib "$mem_used_kb")
+mem_available=$(human_readable_kib "$mem_available_kb")
+
+swap_total=$(human_readable_kib "$swap_total_kb")
+swap_used=$(human_readable_kib "$swap_used_kb")
+swap_free=$(human_readable_kib "$swap_free_kb")
 
 # RAM display
 echo -e "  ${WHITE}RAM${NC}"
@@ -151,18 +234,18 @@ echo -e "  ───────────────────────
 
 # Find and list 5 largest files in current directory (non-recursive by default)
 # Using find to get files in current directory and subdirectories
-found_files=$(find . -maxdepth 3 -type f -exec du -h {} + 2>/dev/null | sort -rh | head -5)
+found_files=$(find . -maxdepth 3 -type f -exec du -h {} + 2>/dev/null | sort -rh | head -5 || true)
 
 if [ -z "$found_files" ]; then
     echo -e "  ${YELLOW}No files found in current directory${NC}"
 else
-    echo "$found_files" | while read -r size filepath; do
-        # Truncate long paths
+    while IFS=$'\t' read -r size filepath; do
+        [[ -z "$size" ]] && continue
         if [ ${#filepath} -gt 40 ]; then
             filepath="...${filepath: -37}"
         fi
         printf "  ${GREEN}%-10s${NC} ${CYAN}%s${NC}\n" "$size" "$filepath"
-    done
+    done <<< "$found_files"
 fi
 
 # =============================================================================
@@ -185,7 +268,10 @@ if (( mem_percent >= 90 )); then
 fi
 
 # Check disk usage on root
-root_percent=$(df / | awk 'NR==2 {print $5}' | tr -d '%')
+root_percent=0
+if read -r _ _ _ _ percent_value _ < <(df -P / | tail -n +2); then
+    root_percent=${percent_value%%%}
+fi
 if (( root_percent >= 90 )); then
     status="WARNING - Low Disk Space"
     status_color="${RED}"
