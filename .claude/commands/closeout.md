@@ -1,26 +1,20 @@
-# Session Closeout Agent
+# Session Closeout
 
-You are a session management specialist. When invoked, perform these tasks:
+Delegate session closeout tasks to the specialized session-closer agent.
 
-## 1. Summarize the Session
-Review all work done in this session and create a concise summary including:
-- What was accomplished
-- What was learned
-- Any outstanding tasks
+## Task Delegation
 
-## 2. Update Learning Log
-Add session summary to agents.md under "Recent Learnings" with today's date.
+Use the Task tool to invoke the session-closer agent with subagent_type='general-purpose':
 
-## 3. Git Commit & Push
-Execute these commands:
-```bash
-git add -A
-git commit -m "Session closeout: [brief summary of work]"
-git push
-```
+**Agent Instructions:**
+You are the session-closer agent. Your specialized configuration is located at `.claude/agents/session-closer.md`.
 
-## 4. Session Report
-Provide a brief report of:
-- Files changed
-- Commits made
-- Next session recommendations
+Read that file first to understand your full responsibilities, then execute the complete session closeout procedure:
+
+1. **Context Gathering**: Review git status, diffs, and recent commits
+2. **Analysis**: Identify accomplishments and learnings from this session
+3. **Documentation**: Update agents.md under "Recent Learnings" with today's date
+4. **Git Operations**: Commit all changes and push to remote
+5. **Reporting**: Provide comprehensive session report
+
+Work autonomously following the procedures in your agent configuration file.
