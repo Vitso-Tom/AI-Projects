@@ -39,7 +39,16 @@ ai-workspace/
 │
 ├── .gitignore                      # Git ignore patterns
 │
-└── ARCHITECTURE.md                 # This file - workspace documentation
+├── ARCHITECTURE.md                 # This file - workspace documentation
+│
+├── ROADMAP.md                      # Implementation roadmap for n8n integration
+│
+└── n8n-docker/                     # (Planned) n8n workflow automation
+    ├── docker-compose.yml          # n8n container configuration
+    ├── .env                        # Environment variables (not in git)
+    ├── n8n-mcp-server.js          # MCP server for Claude Code integration
+    └── workflows/                  # n8n workflow exports (JSON)
+        └── multi-ai-review.json    # Multi-AI orchestration workflow
 ```
 
 ## Component Descriptions
@@ -95,6 +104,28 @@ ai-workspace/
 - Standard Git ignore patterns
 - Excludes temporary files and system artifacts
 - Keeps repository clean
+
+**`ROADMAP.md`**
+- Implementation guide for n8n integration
+- **Contains:**
+  - Docker installation steps for WSL Ubuntu
+  - n8n deployment configuration
+  - AI orchestration workflow design
+  - MCP server setup instructions
+  - Security considerations for regulated environments
+  - Troubleshooting guide
+- Detailed roadmap for next development phase
+
+**`n8n-docker/`** (Planned Infrastructure)
+- Docker-based n8n workflow automation platform
+- **Purpose:** Visual workflow orchestration + MCP server integration
+- **Components:**
+  - `docker-compose.yml`: Container orchestration config
+  - `.env`: Secure credential storage (excluded from git)
+  - `n8n-mcp-server.js`: Bridge between Claude Code and n8n
+  - `workflows/`: Exportable workflow definitions (JSON)
+- **Integration:** Provides visual representation of multi-AI coordination
+- **Benefits:** Living diagram of architecture + functional automation
 
 ### Specialized Agents
 
@@ -179,7 +210,10 @@ Session Work → Learnings → agents.md → Next Session Context
 | `claude.md` | Symlink | Claude context | → agents.md |
 | `gemini.md` | Symlink | Gemini context | → agents.md |
 | `system-check.sh` | Script | Diagnostics | ~300 lines |
+| `ARCHITECTURE.md` | Documentation | Workspace structure | ~340 lines |
+| `ROADMAP.md` | Documentation | n8n integration guide | ~800 lines |
 | `.gitignore` | Config | Git exclusions | ~5 lines |
+| `n8n-docker/` | Directory (Planned) | Workflow automation | TBD |
 
 ## Design Principles
 
@@ -210,6 +244,60 @@ Session Work → Learnings → agents.md → Next Session Context
 2. Verify symlink with `system-check.sh`
 3. Test access from new AI tool
 4. Document in agents.md
+
+### n8n Workflow Integration (Planned)
+
+**Overview:**
+Integrate n8n as a visual workflow orchestration layer with MCP server connectivity.
+
+**Implementation Steps:**
+1. **Docker Setup**
+   - Install Docker in WSL Ubuntu
+   - Verify system requirements (4GB RAM, 10GB disk)
+   - Configure Docker service auto-start
+
+2. **n8n Deployment**
+   - Create `n8n-docker/` directory
+   - Configure `docker-compose.yml` with security settings
+   - Set up `.env` for credentials (add to .gitignore)
+   - Deploy container: `docker compose up -d`
+   - Access UI: `http://localhost:5678`
+
+3. **Build AI Orchestration Workflows**
+   - Create webhook-triggered workflows
+   - Integrate Claude, Gemini, and Codex APIs
+   - Add aggregation and error handling
+   - Export workflows to `workflows/` directory
+   - Version control workflow JSON files
+
+4. **MCP Server Configuration**
+   - Create `n8n-mcp-server.js` proxy server
+   - Configure Claude Code MCP settings
+   - Test workflow invocation from Claude Code
+   - Document available workflows
+
+5. **Visual Enhancement**
+   - Organize workflow canvas with clear layout
+   - Add documentation sticky notes
+   - Color-code nodes by function
+   - Screenshot workflows for documentation
+
+**Security Considerations:**
+- Change default n8n passwords
+- Store API keys in environment variables only
+- Never commit `.env` files to git
+- Restrict n8n to localhost (127.0.0.1:5678)
+- Regular backups of n8n data volume
+- Audit trail via execution history
+
+**Benefits:**
+- Visual representation of multi-AI workflows
+- Reusable automation patterns
+- Direct integration with Claude Code via MCP
+- Execution monitoring and logging
+- Easy workflow modifications without code changes
+
+**Reference:** See `ROADMAP.md` for detailed implementation guide.
 
 ## Maintenance
 

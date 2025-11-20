@@ -84,5 +84,41 @@ _Log insights here as you work_
 
 - **Agent configuration refinement (2025-11-20)**: Updated session-closer agent documentation to use absolute file paths instead of relative paths. Changed references from `agents.md` to `/home/temlock/ai-workspace/agents.md`. Prevents path resolution errors when agent operates from different working directories. Small but important improvement for reliability in agent-based automation where cwd may vary between bash calls.
 
+- **Architecture documentation (2025-11-20)**: Created comprehensive ARCHITECTURE.md with visual directory structure diagrams using ASCII tree art. Documents complete workspace layout including .claude/ configuration, symlink patterns, specialized agents, design principles, and token efficiency patterns. Provides single reference for understanding workspace organization and maintenance procedures.
+
+## Next Session: n8n Integration
+
+**Goal**: Build functional n8n workflow that provides both visual diagram AND working automation
+
+**Planned Tasks**:
+1. Install Docker in WSL Ubuntu
+2. Deploy n8n container
+3. Build AI orchestration workflow (Claude → Gemini → Codex delegation)
+4. Configure as MCP server for Claude Code
+5. Achieve beautiful n8n visual representation of architecture
+
+**Expected Benefits**:
+- Visual interface for multi-AI workflows
+- Functional automation layer on top of existing architecture
+- MCP server integration with Claude Code
+- Reusable workflow patterns for client consulting
+- Living diagram that mirrors ARCHITECTURE.md
+- Monitoring and tracking of AI task delegation
+
+**Integration Pattern**:
+```
+User Request → Claude Code → n8n Workflow Orchestrator
+                                      ↓
+                              ┌───────┼───────┐
+                              ↓       ↓       ↓
+                           Claude  Gemini  Codex
+                              ↓       ↓       ↓
+                              └───────┼───────┘
+                                      ↓
+                              Aggregated Result
+```
+
+**Reference**: See ROADMAP.md for detailed implementation steps
+
 ---
 **Implementation Note**: agents.md is the master file; claude.md and gemini.md are symbolic links
