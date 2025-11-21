@@ -19,10 +19,18 @@ ai-workspace/
 ├── .claude/                        # Claude Code configuration directory
 │   │
 │   ├── agents/                     # Specialized agent configurations
-│   │   └── session-closer.md      # Session closeout automation agent
+│   │   ├── session-closer.md      # Session closeout automation agent
+│   │   ├── code-reviewer.md       # Multi-AI code review orchestration
+│   │   ├── security-analyzer.md   # Security & compliance auditing
+│   │   ├── optimizer.md           # Performance optimization analysis
+│   │   └── test-runner.md         # Test execution and coverage analysis
 │   │
 │   └── commands/                   # Custom slash commands
-│       └── closeout.md             # /closeout command definition
+│       ├── closeout.md             # /closeout command definition
+│       ├── review.md               # /review command definition
+│       ├── security-audit.md       # /security-audit command definition
+│       ├── optimize.md             # /optimize command definition
+│       └── test.md                 # /test command definition
 │
 ├── agents.md                       # Master agent coordination document
 │                                   # Contains: system context, agent roles,
@@ -144,6 +152,64 @@ ai-workspace/
   - Ensures consistent closeout procedures
   - Maintains audit trail
 
+**`.claude/agents/code-reviewer.md`**
+- **Purpose:** Multi-AI code review orchestration
+- **Responsibilities:**
+  1. Code discovery and analysis (architecture, security, performance)
+  2. Multi-perspective review coordination
+  3. Findings aggregation by priority (P0/P1/P2)
+  4. Actionable feedback generation
+- **Invocation:** `/review` slash command
+- **Benefits:**
+  - Comprehensive code analysis from multiple angles
+  - Structured reports with line-number references
+  - Healthcare/compliance-aware reviews (HIPAA, SOC 2)
+
+**`.claude/agents/security-analyzer.md`**
+- **Purpose:** Security auditing and compliance analysis
+- **Responsibilities:**
+  1. OWASP Top 10 vulnerability scanning
+  2. HIPAA technical safeguards verification
+  3. SOC 2 and NIST CSF control mapping
+  4. PHI/PII exposure detection
+  5. Hardcoded credential scanning
+- **Invocation:** `/security-audit` slash command
+- **Benefits:**
+  - Healthcare-focused security posture assessment
+  - Compliance gap identification
+  - Severity-based prioritization (P0-P3)
+  - Remediation roadmap generation
+
+**`.claude/agents/optimizer.md`**
+- **Purpose:** Performance optimization analysis
+- **Responsibilities:**
+  1. Algorithmic complexity analysis (Big O)
+  2. Database query optimization (N+1 detection)
+  3. Caching opportunity identification
+  4. Resource utilization assessment
+  5. Code-level optimization suggestions
+- **Invocation:** `/optimize` slash command
+- **Benefits:**
+  - Measurable performance improvement estimates
+  - Before/after code examples
+  - Impact-based prioritization (high/medium/low)
+  - Balance between performance and readability
+
+**`.claude/agents/test-runner.md`**
+- **Purpose:** Test execution and coverage analysis
+- **Responsibilities:**
+  1. Test framework detection and execution
+  2. Coverage percentage calculation
+  3. Failure categorization and root cause analysis
+  4. Test quality assessment
+  5. Gap identification and test suggestions
+- **Invocation:** `/test` slash command
+- **Benefits:**
+  - Comprehensive test reporting
+  - Healthcare-critical code coverage verification
+  - Flaky test detection
+  - Test improvement recommendations
+
 ### Custom Commands
 
 **`.claude/commands/closeout.md`**
@@ -154,6 +220,30 @@ ai-workspace/
   2. Command reads session-closer.md configuration
   3. Agent executes full closeout procedure autonomously
   4. Returns comprehensive session report
+
+**`.claude/commands/review.md`**
+- **Command:** `/review`
+- **Function:** Delegates to code-reviewer agent
+- **Usage:** `/review` or `/review src/` or `/review *.py`
+- **Output:** Structured code review with architecture, security, and performance findings
+
+**`.claude/commands/security-audit.md`**
+- **Command:** `/security-audit`
+- **Function:** Delegates to security-analyzer agent
+- **Usage:** `/security-audit`
+- **Output:** Security audit report with OWASP, HIPAA, SOC 2, and NIST CSF findings
+
+**`.claude/commands/optimize.md`**
+- **Command:** `/optimize`
+- **Function:** Delegates to optimizer agent
+- **Usage:** `/optimize`
+- **Output:** Performance analysis with high/medium/low impact optimization opportunities
+
+**`.claude/commands/test.md`**
+- **Command:** `/test`
+- **Function:** Delegates to test-runner agent
+- **Usage:** `/test`
+- **Output:** Test execution results with coverage analysis and improvement recommendations
 
 ## Architecture Patterns
 
@@ -204,13 +294,24 @@ Session Work → Learnings → agents.md → Next Session Context
 
 | File/Directory | Type | Purpose | Lines/Size |
 |----------------|------|---------|------------|
-| `.claude/agents/session-closer.md` | Agent Config | Session automation | ~200 lines |
-| `.claude/commands/closeout.md` | Slash Command | Closeout trigger | ~30 lines |
-| `agents.md` | Documentation | Master coordination | ~180 lines |
+| **Specialized Agents** | | | |
+| `.claude/agents/session-closer.md` | Agent Config | Session closeout automation | ~200 lines |
+| `.claude/agents/code-reviewer.md` | Agent Config | Multi-AI code review | ~300 lines |
+| `.claude/agents/security-analyzer.md` | Agent Config | Security & compliance audit | ~450 lines |
+| `.claude/agents/optimizer.md` | Agent Config | Performance optimization | ~350 lines |
+| `.claude/agents/test-runner.md` | Agent Config | Test execution & coverage | ~400 lines |
+| **Slash Commands** | | | |
+| `.claude/commands/closeout.md` | Slash Command | `/closeout` trigger | ~30 lines |
+| `.claude/commands/review.md` | Slash Command | `/review` trigger | ~25 lines |
+| `.claude/commands/security-audit.md` | Slash Command | `/security-audit` trigger | ~25 lines |
+| `.claude/commands/optimize.md` | Slash Command | `/optimize` trigger | ~25 lines |
+| `.claude/commands/test.md` | Slash Command | `/test` trigger | ~25 lines |
+| **Core Files** | | | |
+| `agents.md` | Documentation | Master coordination | ~300 lines |
 | `claude.md` | Symlink | Claude context | → agents.md |
 | `gemini.md` | Symlink | Gemini context | → agents.md |
 | `system-check.sh` | Script | Diagnostics | ~300 lines |
-| `ARCHITECTURE.md` | Documentation | Workspace structure | ~340 lines |
+| `ARCHITECTURE.md` | Documentation | Workspace structure | ~400 lines |
 | `ROADMAP.md` | Documentation | n8n integration guide | ~800 lines |
 | `.gitignore` | Config | Git exclusions | ~5 lines |
 | `n8n-docker/` | Directory (Planned) | Workflow automation | TBD |
