@@ -1,0 +1,224 @@
+# AI Delegation Configuration Template
+#
+# This file allows you to override the default AI delegation strategy.
+# Copy this file to 'ai-delegation.yml' and customize as needed.
+#
+# Priority (highest to lowest):
+#   1. Environment variables (AI_DELEGATION_SECURITY_ANALYZER=codex)
+#   2. This config file (if it exists and is named 'ai-delegation.yml')
+#   3. Smart defaults (hardcoded in delegation.sh)
+#
+# Version: 1.0.0
+# Date: 2025-11-20
+
+# ============================================================================
+# AGENT DELEGATION MAPPING
+# ============================================================================
+#
+# Available AI options:
+#   - claude:  Use Claude Sonnet 4.5 (best for orchestration, healthcare context)
+#   - codex:   Use Codex GPT-5 (best for optimization, test generation, code review)
+#   - gemini:  Use Google Gemini (best for security scanning, pattern matching)
+#   - multi:   Use multiple AIs (Codex + Gemini, aggregated by Claude)
+#   - hybrid:  Mix of native tools + AI (e.g., bash + Codex for test-runner)
+
+agents:
+  # Session closeout automation
+  # Default: claude (orchestration task)
+  # Recommendation: Keep as 'claude' (requires git context and coordination)
+  session-closer: claude
+
+  # Multi-perspective code review
+  # Default: multi (Codex for architecture, Gemini for security)
+  # Alternatives:
+  #   - codex: Codex-only review (faster, still high quality)
+  #   - claude: Claude-only review (highest context understanding)
+  #   - gemini: Gemini-only review (fast, pattern-focused)
+  code-reviewer: multi
+
+  # Security and compliance auditing
+  # Default: gemini (excellent at pattern matching and security scanning)
+  # Alternatives:
+  #   - codex: More thorough analysis, slower
+  #   - claude: Best healthcare/compliance context, uses most tokens
+  security-analyzer: gemini
+
+  # Performance optimization analysis
+  # Default: codex (exceptional optimization capabilities)
+  # Alternatives:
+  #   - claude: If you need healthcare-specific optimization context
+  #   - gemini: Faster but less detailed optimization suggestions
+  optimizer: codex
+
+  # Test execution and coverage analysis
+  # Default: hybrid (bash for execution, Codex for analysis)
+  # Note: Test execution always uses native tools, AI only for analysis
+  test-runner: hybrid
+
+  # Documentation generation and maintenance
+  # Default: codex (strong technical documentation)
+  # Alternatives:
+  #   - claude: Better narrative docs and healthcare context
+  #   - multi: Codex for API docs, Claude for narrative
+  doc-generator: codex
+
+# ============================================================================
+# MULTI-AI CONFIGURATION (for code-reviewer)
+# ============================================================================
+#
+# When code-reviewer uses 'multi' mode, you can customize which AI handles
+# each phase of the review.
+
+code_reviewer_phases:
+  # Architecture and code quality analysis
+  architecture: codex
+
+  # Security vulnerability scanning
+  security: gemini
+
+  # Results aggregation and prioritization
+  aggregation: claude
+
+# ============================================================================
+# DELEGATION BEHAVIOR
+# ============================================================================
+
+# Automatically fallback to Claude if delegation fails
+auto_fallback: true
+
+# Log all delegation operations for debugging
+enable_logging: true
+
+# Clean up temp files after this many minutes (default: 60)
+cleanup_after_minutes: 60
+
+# Retry failed delegations this many times before falling back
+max_retries: 2
+
+# Timeout for delegation operations (seconds)
+delegation_timeout: 300
+
+# ============================================================================
+# EXAMPLE CONFIGURATIONS
+# ============================================================================
+
+# Example 1: All-Claude (no delegation, maximum context understanding)
+# agents:
+#   session-closer: claude
+#   code-reviewer: claude
+#   security-analyzer: claude
+#   optimizer: claude
+#   test-runner: claude
+#   doc-generator: claude
+
+# Example 2: Maximum delegation (minimum Claude tokens)
+# agents:
+#   session-closer: claude      # Keep for orchestration
+#   code-reviewer: codex        # Fast single-AI review
+#   security-analyzer: gemini   # Pattern matching
+#   optimizer: codex            # Exceptional optimization
+#   test-runner: codex          # Test generation
+#   doc-generator: codex        # Technical docs
+
+# Example 3: Balanced approach (default recommended)
+# agents:
+#   session-closer: claude
+#   code-reviewer: multi        # Multiple perspectives
+#   security-analyzer: gemini   # Fast security scanning
+#   optimizer: codex            # Best optimizer
+#   test-runner: hybrid         # Native tools + AI analysis
+#   doc-generator: codex        # Strong technical writing
+
+# Example 4: Healthcare-focused (maximize compliance context)
+# agents:
+#   session-closer: claude
+#   code-reviewer: claude       # Healthcare context understanding
+#   security-analyzer: claude   # HIPAA/SOC 2 expertise
+#   optimizer: codex            # Technical optimization
+#   test-runner: hybrid
+#   doc-generator: claude       # Compliance documentation
+
+# ============================================================================
+# ENVIRONMENT VARIABLE OVERRIDES
+# ============================================================================
+#
+# You can override any agent's delegation on a per-session basis using
+# environment variables. This takes precedence over this config file.
+#
+# Format: AI_DELEGATION_<AGENT_NAME>=<ai>
+#
+# Examples:
+#   export AI_DELEGATION_SECURITY_ANALYZER=codex
+#   export AI_DELEGATION_OPTIMIZER=claude
+#   export AI_DELEGATION_CODE_REVIEWER=gemini
+#
+# Note: Agent names use underscores in env vars (security_analyzer, not security-analyzer)
+
+# ============================================================================
+# USAGE EXAMPLES
+# ============================================================================
+#
+# 1. Copy this template:
+#    cp ai-delegation.yml.template ai-delegation.yml
+#
+# 2. Edit ai-delegation.yml with your preferences
+#
+# 3. Test with a single agent:
+#    /security-audit
+#    (will use Gemini by default)
+#
+# 4. Override for one session:
+#    export AI_DELEGATION_SECURITY_ANALYZER=codex
+#    /security-audit
+#    (will use Codex instead)
+#
+# 5. View delegation statistics:
+#    source .claude/lib/delegation.sh
+#    get_delegation_stats
+#
+# 6. Enable debug logging:
+#    export AI_DELEGATION_DEBUG=1
+#    /optimize
+#    cat /tmp/ai-delegation.log
+
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+#
+# If delegation fails:
+#
+# 1. Check that CLI tools are installed:
+#    which codex
+#    which gemini
+#
+# 2. Enable debug logging:
+#    export AI_DELEGATION_DEBUG=1
+#
+# 3. Check the log file:
+#    cat /tmp/ai-delegation.log
+#
+# 4. Test delegation manually:
+#    source .claude/lib/delegation.sh
+#    delegate_to_codex "test" "/path/to/file" "/path/to/prompt"
+#
+# 5. Fallback to Claude:
+#    Edit this config to use 'claude' for all agents
+
+# ============================================================================
+# TOKEN ECONOMICS
+# ============================================================================
+#
+# Estimated token savings with default delegation strategy:
+#
+# Agent                 | No Delegation | With Delegation | Savings
+# ----------------------|---------------|-----------------|--------
+# session-closer        | 30K           | 30K             | 0%
+# code-reviewer (multi) | 35K           | 12K             | 66%
+# security-analyzer     | 30K           | 8K              | 73%
+# optimizer             | 30K           | 10K             | 67%
+# test-runner           | 25K           | 12K             | 52%
+# doc-generator         | 30K           | 13K             | 57%
+# ----------------------|---------------|-----------------|--------
+# TOTAL (per workflow)  | 180K          | 85K             | 53%
+#
+# Note: Actual savings depend on codebase size and complexity
