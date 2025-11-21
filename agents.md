@@ -175,5 +175,130 @@ Tailscale Mesh VPN (encrypted tunnel)
 - SSH in for full terminal access when needed
 - Future: Telegram bot → n8n webhook → AI workflow
 
+## Phase 4: Infrastructure as Code & Multi-Node Vision
+
+**Goal**: Transform workspace into push-button deployable infrastructure
+
+### Phase 4A - Containerization
+
+**Objective**: Full workspace as orchestrated containers
+
+**Implementation**:
+- Create comprehensive `docker-compose.yml` orchestrating:
+  - n8n workflow engine
+  - Tailscale sidecar container
+  - AI tool containers (where applicable)
+  - Shared workspace volume
+- Volume mount strategy for data persistence:
+  - `/workspace` → AI workspace data
+  - `n8n_data` → Workflow definitions and execution history
+  - `tailscale_config` → VPN state and configuration
+- Environment variable configuration:
+  - `.env.template` for required variables
+  - Secrets management pattern
+  - API key injection
+- **Result**: Single command deployment (`docker-compose up`)
+
+### Phase 4B - Reproducibility
+
+**Objective**: Enable deployment on fresh systems
+
+**Implementation**:
+- Installation scripts:
+  - `setup-workspace.sh` - Full system bootstrap
+  - `install-dependencies.sh` - Prerequisites (Docker, git, etc.)
+  - `configure-environment.sh` - User-specific configuration
+- Configuration templates:
+  - `.env.template` for environment variables
+  - `config.template.yml` for application settings
+  - SSH key generation and Tailscale auth helpers
+- Documentation for replication:
+  - Step-by-step deployment guide
+  - Prerequisites checklist
+  - Troubleshooting common issues
+  - Security hardening procedures
+
+**Deliverables**:
+- Clone repo → Run script → Workspace operational
+- Configuration wizard for first-time setup
+- Validation script to confirm successful deployment
+
+### Phase 4C - Multi-Node Vision (Future)
+
+**Objective**: Scalable, distributed AI infrastructure
+
+**Architecture**:
+```
+┌──────────────────────────────────────────────────┐
+│         Tailscale Mesh Network (overlay)         │
+└──────────────────────────────────────────────────┘
+         │              │              │
+    ┌────┴───┐     ┌────┴───┐    ┌────┴───┐
+    │ Node 1 │     │ Node 2 │    │ Node 3 │
+    │ (Orch) │     │(Worker)│    │(Worker)│
+    └────────┘     └────────┘    └────────┘
+         │              │              │
+    n8n Central    Claude Node    Gemini Node
+    Orchestrator   + GPU (opt)    + Codex
+```
+
+**Implementation Strategy**:
+- **Terraform modules** for infrastructure provisioning:
+  - Cloud provider agnostic (AWS, Azure, GCP)
+  - On-premises support (bare metal, Proxmox)
+  - Automated network configuration
+- **Distributed AI workers** across multiple systems:
+  - Dedicated nodes for compute-intensive AI operations
+  - GPU-enabled nodes for local model inference (future)
+  - Resource allocation and load balancing
+- **Centralized n8n orchestrator**:
+  - Single source of truth for workflows
+  - Delegates tasks to appropriate worker nodes
+  - Aggregates results from distributed execution
+- **Tailscale mesh** connecting all nodes:
+  - Zero-configuration node discovery
+  - Encrypted communication between nodes
+  - NAT traversal for mixed environments (cloud + on-prem)
+  - Access control lists (ACLs) for node-to-node permissions
+
+**Use Cases**:
+- **Healthcare Client Deployment**: Compliant, auditable AI workflows
+  - On-premises deployment meets data residency requirements
+  - Audit trail across all nodes
+  - HIPAA-compliant architecture patterns
+- **Scalable Processing**: Parallel AI task execution
+  - Code review across large repositories
+  - Batch document analysis
+  - Multi-model inference for comparison
+- **Development/Production Separation**:
+  - Dev node for testing workflows
+  - Production nodes for client work
+  - Isolated environments with mesh connectivity
+
+**Technology Stack**:
+- **Terraform**: Infrastructure provisioning and state management
+- **Ansible** (optional): Configuration management
+- **Docker Swarm or Kubernetes**: Container orchestration
+- **Tailscale**: Secure mesh networking
+- **n8n**: Centralized workflow orchestration
+- **Prometheus + Grafana** (optional): Monitoring and observability
+
+**Expected Benefits**:
+- Consulting-grade architecture ready for client presentations
+- Client-deployable solution with minimal customization
+- Fully documented infrastructure pattern (IaC)
+- Scalability from single laptop to distributed cluster
+- Compliance-ready audit trails and security controls
+- Vendor-agnostic deployment model
+- Professional service offering foundation
+
+**Compliance Considerations**:
+- SOC 2 Type II architecture patterns
+- HIPAA technical safeguards alignment
+- NIST Cybersecurity Framework mapping
+- Audit logging at infrastructure and application layers
+- Data encryption in transit and at rest
+- Access control and authentication enforcement
+
 ---
 **Implementation Note**: agents.md is the master file; claude.md and gemini.md are symbolic links
