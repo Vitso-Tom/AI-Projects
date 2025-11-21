@@ -23,14 +23,16 @@ ai-workspace/
 │   │   ├── code-reviewer.md       # Multi-AI code review orchestration
 │   │   ├── security-analyzer.md   # Security & compliance auditing
 │   │   ├── optimizer.md           # Performance optimization analysis
-│   │   └── test-runner.md         # Test execution and coverage analysis
+│   │   ├── test-runner.md         # Test execution and coverage analysis
+│   │   └── doc-generator.md       # Documentation generation and maintenance
 │   │
 │   └── commands/                   # Custom slash commands
 │       ├── closeout.md             # /closeout command definition
 │       ├── review.md               # /review command definition
 │       ├── security-audit.md       # /security-audit command definition
 │       ├── optimize.md             # /optimize command definition
-│       └── test.md                 # /test command definition
+│       ├── test.md                 # /test command definition
+│       └── document.md             # /document command definition
 │
 ├── agents.md                       # Master agent coordination document
 │                                   # Contains: system context, agent roles,
@@ -210,6 +212,24 @@ ai-workspace/
   - Flaky test detection
   - Test improvement recommendations
 
+**`.claude/agents/doc-generator.md`**
+- **Purpose:** Documentation generation and maintenance
+- **Responsibilities:**
+  1. Documentation discovery and gap analysis
+  2. README.md generation and updates
+  3. API documentation creation (docstrings, JSDoc)
+  4. Architecture diagram generation (ASCII, Mermaid)
+  5. CHANGELOG.md maintenance
+  6. Code comment quality assessment
+  7. HIPAA/compliance documentation verification
+- **Invocation:** `/document` slash command
+- **Benefits:**
+  - Comprehensive project documentation
+  - Client-ready professional formatting
+  - Compliance documentation (HIPAA §164.312 references)
+  - Onboarding and knowledge transfer support
+  - Documentation gap identification
+
 ### Custom Commands
 
 **`.claude/commands/closeout.md`**
@@ -244,6 +264,12 @@ ai-workspace/
 - **Function:** Delegates to test-runner agent
 - **Usage:** `/test`
 - **Output:** Test execution results with coverage analysis and improvement recommendations
+
+**`.claude/commands/document.md`**
+- **Command:** `/document`
+- **Function:** Delegates to doc-generator agent
+- **Usage:** `/document`
+- **Output:** Documentation generation report with README, API docs, architecture diagrams, and gap analysis
 
 ## Architecture Patterns
 
@@ -300,12 +326,14 @@ Session Work → Learnings → agents.md → Next Session Context
 | `.claude/agents/security-analyzer.md` | Agent Config | Security & compliance audit | ~450 lines |
 | `.claude/agents/optimizer.md` | Agent Config | Performance optimization | ~350 lines |
 | `.claude/agents/test-runner.md` | Agent Config | Test execution & coverage | ~400 lines |
+| `.claude/agents/doc-generator.md` | Agent Config | Documentation generation | ~500 lines |
 | **Slash Commands** | | | |
 | `.claude/commands/closeout.md` | Slash Command | `/closeout` trigger | ~30 lines |
 | `.claude/commands/review.md` | Slash Command | `/review` trigger | ~25 lines |
 | `.claude/commands/security-audit.md` | Slash Command | `/security-audit` trigger | ~25 lines |
 | `.claude/commands/optimize.md` | Slash Command | `/optimize` trigger | ~25 lines |
 | `.claude/commands/test.md` | Slash Command | `/test` trigger | ~25 lines |
+| `.claude/commands/document.md` | Slash Command | `/document` trigger | ~25 lines |
 | **Core Files** | | | |
 | `agents.md` | Documentation | Master coordination | ~300 lines |
 | `claude.md` | Symlink | Claude context | → agents.md |
