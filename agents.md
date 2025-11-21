@@ -122,5 +122,56 @@ User Request → Claude Code → n8n Workflow Orchestrator
 
 **Reference**: See ROADMAP.md for detailed implementation steps
 
+## Phase 3: Remote Mobile Access
+
+**Goal**: Enable secure remote interaction with AI workspace from mobile devices
+
+**Approach**: Tailscale + n8n webhooks for two access patterns:
+1. **Direct CLI access** via Tailscale mesh VPN (full terminal from phone)
+2. **Webhook-based task automation** (quick commands via mobile browser or future Telegram bot)
+
+**Planned Tasks**:
+1. Install Tailscale on WSL Ubuntu and mobile device
+2. Configure secure mesh network
+3. Test SSH access from phone to WSL
+4. Set up n8n webhook authentication
+5. Create mobile-friendly webhook endpoints for common tasks (system check, closeout, code review)
+
+**Security Controls**:
+- Tailscale zero-trust mesh network (no exposed public ports)
+- n8n authentication tokens for webhook access
+- Rate limiting on webhook endpoints
+- Audit logging via git commits
+- MFA on Tailscale account
+- Device authorization and deauthorization controls
+
+**Expected Benefits**:
+- Access AI workspace from anywhere securely
+- Run automation and workflows remotely
+- Quick status checks from mobile browser
+- Maintain security posture (zero-trust, encrypted mesh)
+- Future extensibility: Telegram bot integration
+- Consulting demo capability: show clients remote AI orchestration
+
+**Architecture Pattern**:
+```
+Mobile Device (authorized on Tailscale)
+    ↓
+Tailscale Mesh VPN (encrypted tunnel)
+    ↓
+┌─────────────────────────────────┐
+│  WSL Ubuntu (workspace)         │
+│  ├─ SSH (full terminal access)  │
+│  └─ n8n webhooks (automation)   │
+└─────────────────────────────────┘
+```
+
+**Use Cases**:
+- Quick `/closeout` from phone after session
+- Run `system-check.sh` remotely
+- Trigger multi-AI code review from mobile browser
+- SSH in for full terminal access when needed
+- Future: Telegram bot → n8n webhook → AI workflow
+
 ---
 **Implementation Note**: agents.md is the master file; claude.md and gemini.md are symbolic links
