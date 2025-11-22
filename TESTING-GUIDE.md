@@ -108,29 +108,64 @@ cat > app.py <<'EOF'
 import os
 import sqlite3
 
-# SECURITY ISSUE: Hardcoded credentials
-DATABASE_PASSWORD = "admin123"
-API_KEY = "sk_live_51234567890abcdefgh"
+# WARNING: SECURITY ISSUE - Hardcoded credentials
+# This is an INSECURE EXAMPLE for testing purposes only.
+# Never use hardcoded credentials in production code.
+DATABASE_PASSWORD = "EXAMPLE_PASSWORD_REPLACE_ME"
+API_KEY = "sk_test_EXAMPLE_REPLACE_WITH_REAL_KEY"
 
 def get_user(user_id):
-    # SECURITY ISSUE: SQL injection
+    # WARNING: SECURITY ISSUE - SQL injection vulnerability
+    # This is an INSECURE EXAMPLE for testing purposes only.
     conn = sqlite3.connect('database.db')
     query = "SELECT * FROM users WHERE id = " + user_id
     result = conn.execute(query)
     return result.fetchone()
 
 def run_command(cmd):
-    # SECURITY ISSUE: Command injection
+    # WARNING: SECURITY ISSUE - Command injection vulnerability
+    # This is an INSECURE EXAMPLE for testing purposes only.
     os.system(cmd)
 
 def process_data(data):
-    # SECURITY ISSUE: No input validation
+    # WARNING: SECURITY ISSUE - Dangerous eval() usage
+    # This is an INSECURE EXAMPLE for testing purposes only.
     return eval(data)
 EOF
 
 cat > README.md <<'EOF'
 # Test Security App
 This app has intentional security vulnerabilities for testing.
+EOF
+
+# OPTIONAL: Create a secure version for comparison
+cat > app_secure.py <<'EOF'
+import os
+import sqlite3
+import subprocess
+
+# SECURE: Use environment variables for credentials
+DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
+API_KEY = os.getenv('API_KEY')
+
+def get_user(user_id):
+    # SECURE: Use parameterized queries to prevent SQL injection
+    conn = sqlite3.connect('database.db')
+    query = "SELECT * FROM users WHERE id = ?"
+    result = conn.execute(query, (user_id,))
+    return result.fetchone()
+
+def run_command(cmd):
+    # SECURE: Use subprocess with shell=False to prevent command injection
+    # Only allow specific commands from a whitelist
+    import subprocess
+    subprocess.run([cmd], shell=False, check=True)
+
+def process_data(data):
+    # SECURE: Use json.loads() instead of eval() for parsing data
+    # Validate and sanitize all input
+    import json
+    return json.loads(data)
 EOF
 ```
 

@@ -281,19 +281,34 @@ Target token consumption per agent execution:
 
 ### Testing with Intentional Vulnerabilities
 
+WARNING: SECURITY WARNING - The following examples contain intentional vulnerabilities for testing purposes only.
+Never use these patterns in production code.
+
 ```bash
 # Create test app with security issues
 mkdir -p /tmp/test-security-app
 cat > /tmp/test-security-app/app.py <<'EOF'
 import os
 
-# Hardcoded credential (should be detected as P0)
-API_KEY = "sk_live_1234567890"
+# WARNING: INSECURE EXAMPLE - Hardcoded credential (should be detected as P0)
+# Never use hardcoded credentials in production.
+# Secure alternative: API_KEY = os.getenv('API_KEY')
+API_KEY = "sk_test_EXAMPLE_REPLACE_WITH_REAL_KEY"
 
 def get_user(user_id):
-    # SQL injection vulnerability (should be detected as P0)
+    # WARNING: INSECURE EXAMPLE - SQL injection vulnerability (should be detected as P0)
+    # Secure alternative: Use parameterized queries
+    # SECURE: query = "SELECT * FROM users WHERE id = ?"
+    # SECURE: return execute(query, (user_id,))
     query = "SELECT * FROM users WHERE id = " + user_id
     return execute(query)
+
+def run_command(cmd):
+    # WARNING: INSECURE EXAMPLE - Command injection (should be detected as P0)
+    # Secure alternative: Use subprocess with shell=False
+    # SECURE: import subprocess
+    # SECURE: subprocess.run([cmd], shell=False, check=True)
+    os.system(cmd)
 EOF
 
 # Run security audit

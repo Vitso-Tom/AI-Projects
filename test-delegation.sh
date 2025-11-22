@@ -164,7 +164,9 @@ if [[ "$TEST_LEVEL" == "full" || "$TEST_LEVEL" == "poc" ]]; then
 Analyze this simple bash script and identify any potential issues:
 
 #!/bin/bash
-PASSWORD="hardcoded123"
+# WARNING: INSECURE EXAMPLE for testing only
+# Never use hardcoded credentials in production
+PASSWORD="EXAMPLE_PASSWORD_REPLACE_ME"
 echo "Connecting to database..."
 mysql -u root -p$PASSWORD -e "SELECT * FROM users WHERE id=$1"
 EOF

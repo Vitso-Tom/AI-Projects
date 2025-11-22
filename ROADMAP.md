@@ -182,6 +182,9 @@ Production-ready with persistent data and proper configuration.
 
 ### Option A: Simple Docker Run
 
+WARNING: SECURITY WARNING - Change default credentials before deployment.
+Replace "CHANGE_ME_INSECURE_DEFAULT" with a strong, unique password.
+
 ```bash
 docker run -d \
   --name n8n \
@@ -189,7 +192,7 @@ docker run -d \
   -v n8n_data:/home/node/.n8n \
   -e N8N_BASIC_AUTH_ACTIVE=true \
   -e N8N_BASIC_AUTH_USER=admin \
-  -e N8N_BASIC_AUTH_PASSWORD=changeme123 \
+  -e N8N_BASIC_AUTH_PASSWORD=CHANGE_ME_INSECURE_DEFAULT \
   -e WEBHOOK_URL=http://localhost:5678/ \
   n8nio/n8n
 ```
@@ -205,6 +208,10 @@ cd ~/n8n-docker
 ```
 
 **Step 2: Create docker-compose.yml**
+
+WARNING: SECURITY WARNING - Change default credentials before deployment.
+Never use default passwords in production environments.
+
 ```yaml
 version: '3.8'
 
@@ -219,7 +226,7 @@ services:
       # Security
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-changeme123}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-CHANGE_ME_INSECURE_DEFAULT}
 
       # Core Configuration
       - N8N_HOST=localhost
@@ -262,10 +269,15 @@ volumes:
 ```
 
 **Step 3: Create Environment File**
+
+WARNING: SECURITY WARNING - Replace all example credentials with strong, unique passwords.
+Never commit this .env file to version control. Add it to .gitignore.
+
 ```bash
 cat > .env <<'EOF'
 # n8n Configuration
-N8N_PASSWORD=YourSecurePasswordHere
+# WARNING: Change this to a strong, unique password
+N8N_PASSWORD=REPLACE_WITH_STRONG_PASSWORD_MINIMUM_16_CHARS
 
 # Change these for production
 N8N_HOST=localhost

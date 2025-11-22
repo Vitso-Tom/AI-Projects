@@ -13,15 +13,38 @@ set -euo pipefail
 # CONFIGURATION
 # ============================================================================
 
-REPORTS_DIR="${REPORTS_DIR:-/mnt/c/Users/thoma/onedrive/documents/AI-Workspace/Reports}"
+# Detect OneDrive path dynamically (P0 optimization - fixes hardcoding issue)
+detect_onedrive_path() {
+    local onedrive_paths=(
+        "/mnt/c/Users/$USER/OneDrive/Documents/AI-Workspace/Reports"
+        "/mnt/c/Users/$USER/onedrive/documents/AI-Workspace/Reports"
+        "/mnt/c/Users/thoma/OneDrive/Documents/AI-Workspace/Reports"
+        "/mnt/c/Users/thoma/onedrive/documents/AI-Workspace/Reports"
+        "$HOME/OneDrive/Documents/AI-Workspace/Reports"
+        "$HOME/Documents/AI-Workspace/Reports"
+        "/tmp/ai-workspace-reports"  # Fallback
+    )
+
+    for path in "${onedrive_paths[@]}"; do
+        if [[ -d "$(dirname "$path")" ]]; then
+            mkdir -p "$path" 2>/dev/null && echo "$path" && return 0
+        fi
+    done
+
+    # Final fallback
+    mkdir -p "/tmp/ai-workspace-reports"
+    echo "/tmp/ai-workspace-reports"
+}
+
+REPORTS_DIR="${REPORTS_DIR:-$(detect_onedrive_path)}"
 REPORT_DATE_FORMAT="%Y-%m-%d_%H-%M-%S"
 REPORT_EMAIL_ENABLED="${REPORT_EMAIL_ENABLED:-false}"
 REPORT_EMAIL_TO="${REPORT_EMAIL_TO:-}"
 REPORT_EMAIL_FROM="${REPORT_EMAIL_FROM:-ai-agents@localhost}"
 REPORT_EMAIL_SMTP="${REPORT_EMAIL_SMTP:-localhost}"
 
-# Create reports directory if it doesn't exist
-mkdir -p "$REPORTS_DIR"
+# Create reports directory if it doesn't exist (only if not already created)
+[[ -d "$REPORTS_DIR" ]] || mkdir -p "$REPORTS_DIR"
 
 # ============================================================================
 # REPORT GENERATION
@@ -45,6 +68,8 @@ generate_security_report() {
     local timestamp=$(date +"$REPORT_DATE_FORMAT")
     local report_file="$REPORTS_DIR/security-audit_${timestamp}.md"
 
+    # P1 Security Fix: Create report with secure permissions (600)
+    # This ensures only the owner can read/write sensitive security findings
     cat > "$report_file" <<EOF
 # Security Audit Report
 
@@ -75,6 +100,9 @@ $content
 For questions about this report, contact your security team.
 EOF
 
+    # P1 Security Fix: Set secure permissions (owner read/write only)
+    chmod 600 "$report_file"
+
     echo "$report_file"
 }
 
@@ -96,6 +124,7 @@ generate_optimization_report() {
     local timestamp=$(date +"$REPORT_DATE_FORMAT")
     local report_file="$REPORTS_DIR/optimization_${timestamp}.md"
 
+    # P1 Security Fix: Create report with secure permissions (600)
     cat > "$report_file" <<EOF
 # Performance Optimization Report
 
@@ -124,6 +153,9 @@ $content
 For questions about this report, contact your development team.
 EOF
 
+    # P1 Security Fix: Set secure permissions (owner read/write only)
+    chmod 600 "$report_file"
+
     echo "$report_file"
 }
 
@@ -145,6 +177,7 @@ generate_code_review_report() {
     local timestamp=$(date +"$REPORT_DATE_FORMAT")
     local report_file="$REPORTS_DIR/code-review_${timestamp}.md"
 
+    # P1 Security Fix: Create report with secure permissions (600)
     cat > "$report_file" <<EOF
 # Code Review Report
 
@@ -174,6 +207,9 @@ $content
 For questions about this report, contact your code review team.
 EOF
 
+    # P1 Security Fix: Set secure permissions (owner read/write only)
+    chmod 600 "$report_file"
+
     echo "$report_file"
 }
 
@@ -195,6 +231,7 @@ generate_test_report() {
     local timestamp=$(date +"$REPORT_DATE_FORMAT")
     local report_file="$REPORTS_DIR/test-execution_${timestamp}.md"
 
+    # P1 Security Fix: Create report with secure permissions (600)
     cat > "$report_file" <<EOF
 # Test Execution Report
 
@@ -224,6 +261,9 @@ $content
 For questions about this report, contact your QA team.
 EOF
 
+    # P1 Security Fix: Set secure permissions (owner read/write only)
+    chmod 600 "$report_file"
+
     echo "$report_file"
 }
 
@@ -245,6 +285,7 @@ generate_documentation_report() {
     local timestamp=$(date +"$REPORT_DATE_FORMAT")
     local report_file="$REPORTS_DIR/documentation_${timestamp}.md"
 
+    # P1 Security Fix: Create report with secure permissions (600)
     cat > "$report_file" <<EOF
 # Documentation Generation Report
 
@@ -273,6 +314,9 @@ $content
 
 For questions about this report, contact your documentation team.
 EOF
+
+    # P1 Security Fix: Set secure permissions (owner read/write only)
+    chmod 600 "$report_file"
 
     echo "$report_file"
 }
