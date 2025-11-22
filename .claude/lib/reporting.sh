@@ -13,7 +13,7 @@ set -euo pipefail
 # CONFIGURATION
 # ============================================================================
 
-REPORTS_DIR="${REPORTS_DIR:-/home/temlock/ai-workspace/reports}"
+REPORTS_DIR="${REPORTS_DIR:-/mnt/c/Users/thoma/onedrive/documents/AI-Workspace/Reports}"
 REPORT_DATE_FORMAT="%Y-%m-%d_%H-%M-%S"
 REPORT_EMAIL_ENABLED="${REPORT_EMAIL_ENABLED:-false}"
 REPORT_EMAIL_TO="${REPORT_EMAIL_TO:-}"

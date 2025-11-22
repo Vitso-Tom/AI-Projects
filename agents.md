@@ -15,6 +15,23 @@ Learning and experimentation workspace for integrating multiple AI tools (Claude
 - **AI Tools**: Claude Code, Gemini CLI, Codex/OpenAI CLI
 - **Version Control**: Git
 
+## File Architecture
+
+This workspace uses a two-file documentation pattern:
+
+1. **Session History** (evolving):
+   - `agents.md` - Master session log (this file)
+   - `claude.md` → symlink to agents.md
+   - `gemini.md` → symlink to agents.md
+   - Purpose: Track session work, learnings, decisions, and project evolution
+
+2. **Development Reference** (stable):
+   - `DEVELOPMENT.md` - Stable development guide
+   - Purpose: Onboarding instructions, commands, architecture patterns, best practices
+   - Read by Claude Code on `/init` for workspace guidance
+
+**Why this pattern?** Session context (agents.md) evolves with each session, while development guidance (DEVELOPMENT.md) remains stable. Symlinks ensure all AI tools access the same session history without duplication.
+
 ## Workspace Goals
 1. Learn terminal-based AI workflows
 2. Understand multi-AI collaboration patterns
@@ -123,6 +140,14 @@ _Log insights here as you work_
   - **Configuration pattern**: YAML-based AI selection per agent type (`ai-delegation.yml.template`) enables flexible AI routing based on task characteristics (pattern detection vs. content generation vs. compliance analysis)
   - **Healthcare/compliance integration**: Delegation maintains security requirements - all AI calls logged, results stored in `reports/` directory with timestamps, audit trail preserved via git
   - Result: Complete multi-AI orchestration system ready for consulting engagements - demonstrates token cost optimization (critical for large codebase analysis) while maintaining healthcare compliance awareness
+
+- **File architecture clarification and SDLC validation (2025-11-22)**: Formalized workspace documentation pattern and validated complete agent workflow end-to-end:
+  - **Two-file documentation pattern**: Separated session history (agents.md - evolving) from development reference (DEVELOPMENT.md - stable). Renamed CLAUDE.md → DEVELOPMENT.md to better reflect purpose as onboarding/best practices guide. Pattern prevents context bloat: session history grows indefinitely while development docs stay scannable.
+  - **OneDrive reports integration**: Configured reporting.sh to save all reports to `/mnt/c/Users/thoma/onedrive/documents/AI-Workspace/Reports` for cloud sync and client delivery. Critical for consulting workflow requiring external report sharing.
+  - **Gemini CLI upgrade**: Upgraded to paid subscription unlocking Gemini 2.0 Flash Thinking for improved pattern detection in security/optimization workflows.
+  - **Full SDLC workflow validation**: Ran complete agent pipeline (/review → /security-audit → /optimize) generating 3 comprehensive reports. Validated that delegated agents maintain professional quality while achieving 60-73% token savings. Code review identified meaningful issues (A- grade, 8 strengths, 3 improvements), security audit correctly flagged P0/P1 vulnerabilities with HIPAA/SOC 2 context, optimizer provided 15 actionable improvements with 35-92% projected gains.
+  - **Healthcare compliance validation**: All agent outputs included HIPAA §164.312, SOC 2, NIST CSF references demonstrating maintained compliance awareness despite delegation.
+  - Result: Documentation architecture clarified, OneDrive integration operational, SDLC automation validated for consulting-grade deliverables with cloud sync capability.
 
 ## Next Session: n8n Integration
 
@@ -333,6 +358,79 @@ Tailscale Mesh VPN (encrypted tunnel)
 - Audit logging at infrastructure and application layers
 - Data encryption in transit and at rest
 - Access control and authentication enforcement
+
+## Recent Work
+
+### Session: 2025-11-22 - Docker Installation
+
+**Goal**: Install Docker in WSL Ubuntu as foundation for n8n automation platform
+
+**What we accomplished**:
+- Installed Docker Engine, Docker CLI, containerd, and docker-compose plugin
+- Added temlock user to docker group for sudo-less operation
+- Started Docker service in WSL
+- Verified installation with hello-world test container
+- Docker version: 29.0.2
+
+**Technical details**:
+- Platform: WSL 2 running Ubuntu 22.04 (jammy)
+- Architecture: amd64
+- Installation method: Official Docker repository (apt-get)
+- Docker repository: https://download.docker.com/linux/ubuntu
+
+**Next steps**:
+- Install n8n as Docker container
+- Configure n8n for multi-AI orchestration
+- Mount ai-workspace directory for context access
+
+**Status**: Docker fully operational and ready for n8n deployment
+
+### Session: 2025-11-22 - File Architecture + SDLC Validation + OneDrive Integration
+
+**Goal**: Clarify workspace file organization, validate SDLC agent workflows, configure OneDrive reports integration, and upgrade Gemini CLI
+
+**What we accomplished**:
+- **File Architecture Clarification**: Added "File Architecture" section to agents.md documenting the two-file pattern (session history in agents.md vs. stable development guide in DEVELOPMENT.md). Renamed CLAUDE.md to DEVELOPMENT.md to better reflect its stable reference purpose. Created clear separation between evolving session context and static onboarding/best practices documentation.
+- **OneDrive Reports Integration**: Updated .claude/lib/reporting.sh to save all reports to `/mnt/c/Users/thoma/onedrive/documents/AI-Workspace/Reports` instead of local workspace directory. Enables cloud sync and client delivery. Validated path exists and is writable.
+- **Gemini CLI Upgrade**: Upgraded from free tier to paid subscription. Reinstalled Gemini CLI after subscription upgrade. Verified working with test query. Enables higher quality analysis for delegation workflows.
+- **Full SDLC Workflow Validation**: Ran complete agent workflow to validate token efficiency and quality:
+  - `/review` - Code review (Grade: A-, 8 strengths, 3 improvements identified)
+  - `/security-audit` - Security analysis (2 P0, 3 P1 findings with HIPAA/SOC 2 context)
+  - `/optimize` - Performance optimization (15 improvements, 35-92% efficiency gains projected)
+- **Reports Generated to OneDrive**:
+  - code-review_2025-11-22_17-38-40.md
+  - security-audit_2025-11-22_22-44-50.md
+  - optimization_2025-11-22_17-48-24.md
+
+**Key Learnings**:
+- **Documentation Pattern Validation**: Two-file approach (agents.md for session history + DEVELOPMENT.md for stable guidance) prevents context bloat. Session history can grow indefinitely while onboarding docs remain clean and scannable.
+- **OneDrive as Report Destination**: Storing reports in OneDrive enables seamless sync across devices and provides client-ready deliverables location. Critical for consulting workflow where reports need to be shared externally.
+- **SDLC Automation Quality**: Validated that delegated agents maintain professional-grade output quality while achieving 60-73% token savings. Code review identified meaningful issues (error handling, validation, documentation gaps), security audit correctly flagged hardcoded credentials and injection risks, optimizer provided actionable improvements with projected performance gains.
+- **Gemini Paid Tier Impact**: Paid subscription unlocks Gemini 2.0 Flash Thinking model with improved reasoning. Critical for pattern detection workflows (security scanning, vulnerability analysis).
+
+**Files Modified**:
+- `CLAUDE.md` → Renamed to `DEVELOPMENT.md` (stable development reference)
+- `agents.md` - Added File Architecture section + Docker session notes
+- `.claude/lib/reporting.sh` - Updated REPORTS_DIR to OneDrive path
+
+**Technical Details**:
+- OneDrive path: `/mnt/c/Users/thoma/onedrive/documents/AI-Workspace/Reports`
+- DEVELOPMENT.md size: ~12KB (comprehensive development guide)
+- Reports generated: 3 comprehensive markdown reports with compliance context
+- Token efficiency: Achieved 60-73% reduction via delegation (8-12K vs 30K tokens)
+
+**Consulting Value**:
+- Demonstrates end-to-end automated SDLC workflow for potential clients
+- OneDrive integration shows cloud-native reporting for distributed teams
+- Healthcare/compliance context in all security findings aligns with target market
+- Professional-grade deliverables validate multi-AI orchestration quality
+
+**Next steps**:
+- Deploy n8n container using Docker
+- Build visual workflow diagrams mirroring agent delegation architecture
+- Configure n8n as MCP server for Claude Code integration
+
+**Status**: File architecture clarified, OneDrive integration operational, SDLC automation validated, Gemini CLI upgraded to paid tier
 
 ---
 **Implementation Note**: agents.md is the master file; claude.md and gemini.md are symbolic links
