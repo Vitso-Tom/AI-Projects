@@ -102,8 +102,26 @@ Run these commands in parallel:
   - Claude Code attribution
 - Push to remote: `git push`
 
-### Phase 5: Reporting
-Generate and output session report with all required sections.
+### Phase 5: Snapshot Status Check
+Check for snapshots created during this session:
+```bash
+# List recent snapshots (tags)
+git tag -l "snapshot-*" --sort=-creatordate | head -n 5
+
+# List recovery branches
+git branch --list "snapshot/*" --sort=-committerdate | head -n 5
+
+# Check for backup bundles
+ls -lh ~/ai-workspace/backups/*.bundle 2>/dev/null | tail -n 3
+```
+
+Include in report:
+- Number of snapshots created this session
+- Most recent snapshot names
+- Recommendation to run `/snapshot --cleanup` if >10 snapshots exist
+
+### Phase 6: Reporting
+Generate and output session report with all required sections including snapshot status.
 
 ## Example Session Summary Format
 

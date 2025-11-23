@@ -82,6 +82,75 @@ Provide:
 - **Performance Profile**: Optimization opportunities
 - **Next Steps**: Prioritized remediation plan
 
+## Snapshot Safety Integration
+
+### Pre-Execution Snapshot Check
+
+**IMPORTANT**: Before executing any code changes or major analysis, check for recent snapshots:
+
+```bash
+# Check for recent snapshots (within 30 minutes)
+RECENT_SNAPSHOT=$(git tag -l "snapshot-*" --sort=-creatordate --format='%(creatordate:unix) %(refname:short)' | head -n 1)
+
+if [[ -n "$RECENT_SNAPSHOT" ]]; then
+    SNAPSHOT_TIME=$(echo "$RECENT_SNAPSHOT" | awk '{print $1}')
+    CURRENT_TIME=$(date +%s)
+    AGE_MINUTES=$(( ($CURRENT_TIME - $SNAPSHOT_TIME) / 60 ))
+
+    if [[ $AGE_MINUTES -gt 30 ]]; then
+        SNAPSHOT_EXISTS="false"
+    else
+        SNAPSHOT_NAME=$(echo "$RECENT_SNAPSHOT" | awk '{print $2}')
+        SNAPSHOT_EXISTS="true"
+    fi
+else
+    SNAPSHOT_EXISTS="false"
+fi
+```
+
+### Snapshot Decision Logic
+
+**If no recent snapshot exists**:
+```
+⚠️  No recent snapshot detected
+
+Recommend creating snapshot before code review.
+This review may suggest significant refactoring.
+
+Options:
+1. Create snapshot: /snapshot "before-review-$(date +%Y%m%d-%H%M%S)" --branch
+2. Continue without snapshot (not recommended for large changes)
+
+Type '1' to create snapshot, '2' to continue anyway:
+```
+
+**If bypass mode or auto-mode**:
+```bash
+# Automatically create snapshot if none exists
+if [[ "$SNAPSHOT_EXISTS" == "false" ]]; then
+    SNAPSHOT_NAME="before-review-$(date +%Y%m%d-%H%M%S)"
+    git tag -a "snapshot-$SNAPSHOT_NAME" -m "Auto-snapshot before code review"
+    echo "✓ Auto-created snapshot: snapshot-$SNAPSHOT_NAME"
+fi
+```
+
+### Report Integration
+
+Include snapshot information in review report:
+
+```markdown
+## Code Review Report
+**Date**: YYYY-MM-DD
+**Scope**: [files/directories reviewed]
+**Snapshot**: snapshot-before-review-YYYYMMDD-HHMMSS (created automatically)
+
+### Restoration
+If review changes cause issues:
+\`\`\`bash
+/snapshot --restore before-review-YYYYMMDD-HHMMSS
+\`\`\`
+```
+
 ## Operating Principles
 
 ### Autonomy
@@ -89,6 +158,7 @@ Provide:
 - Determine which files need deeper analysis
 - Prioritize issues based on severity
 - Generate comprehensive reports without asking for guidance
+- Auto-create snapshots in automated workflows
 
 ### Thoroughness
 - Review ALL files in scope (don't sample)

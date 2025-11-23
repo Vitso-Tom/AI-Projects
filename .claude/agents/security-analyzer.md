@@ -92,6 +92,105 @@ If Gemini delegation fails:
 3. Use bash tools (grep, rg) for pattern detection
 4. Claude performs analysis and report generation
 
+## Snapshot Safety Integration
+
+### Pre-Execution Snapshot Check
+
+**CRITICAL**: Security fixes often require code changes. Always check for snapshots before analysis:
+
+```bash
+# Check for recent snapshots (within 30 minutes)
+check_recent_snapshot() {
+    RECENT_SNAPSHOT=$(git tag -l "snapshot-*" --sort=-creatordate --format='%(creatordate:unix) %(refname:short)' | head -n 1)
+
+    if [[ -n "$RECENT_SNAPSHOT" ]]; then
+        SNAPSHOT_TIME=$(echo "$RECENT_SNAPSHOT" | awk '{print $1}')
+        CURRENT_TIME=$(date +%s)
+        AGE_MINUTES=$(( ($CURRENT_TIME - $SNAPSHOT_TIME) / 60 ))
+
+        if [[ $AGE_MINUTES -le 30 ]]; then
+            SNAPSHOT_NAME=$(echo "$RECENT_SNAPSHOT" | awk '{print $2}')
+            echo "✓ Recent snapshot exists: $SNAPSHOT_NAME ($AGE_MINUTES min ago)"
+            return 0
+        fi
+    fi
+
+    echo "⚠️  No recent snapshot detected"
+    return 1
+}
+```
+
+### Snapshot Decision Logic
+
+**If no recent snapshot exists**:
+```
+🔒 Security Audit Pre-Flight Check
+
+No recent snapshot detected. Security fixes may require significant changes.
+
+Recommend creating snapshot before proceeding:
+  /snapshot "before-security-audit-$(date +%Y%m%d)" --branch
+
+Options:
+1. Create snapshot now (recommended)
+2. Continue without snapshot (risky for compliance)
+
+Choice [1/2]:
+```
+
+**In automated/bypass mode**:
+```bash
+# Auto-create snapshot for security audits (compliance requirement)
+if ! check_recent_snapshot; then
+    SNAPSHOT_NAME="before-security-audit-$(date +%Y%m%d-%H%M%S)"
+    git tag -a "snapshot-$SNAPSHOT_NAME" -m "Auto-snapshot before security audit
+
+Required for compliance: HIPAA §164.312(b) - Audit Controls
+Allows rollback if security fixes introduce issues"
+
+    echo "✓ Auto-created compliance snapshot: snapshot-$SNAPSHOT_NAME"
+
+    # Log to agents.md for audit trail
+    echo "### [$(date +%Y%m%d-%H%M%S)] Security Audit Snapshot" >> .claude/agents/agents.md
+    echo "- **Type**: quick (tag)" >> .claude/agents/agents.md
+    echo "- **Reason**: Pre-security-audit safety checkpoint" >> .claude/agents/agents.md
+    echo "- **Compliance**: HIPAA §164.312(b) - Audit Controls" >> .claude/agents/agents.md
+    echo "- **Restoration**: \`git checkout tags/snapshot-$SNAPSHOT_NAME\`" >> .claude/agents/agents.md
+    echo "" >> .claude/agents/agents.md
+fi
+```
+
+### Report Integration
+
+Include snapshot information in security audit report:
+
+```markdown
+## Security Audit Report
+**Date**: YYYY-MM-DD HH:MM:SS
+**Scope**: [files/directories audited]
+**Snapshot**: snapshot-before-security-audit-YYYYMMDD-HHMMSS
+**Compliance**: HIPAA §164.312(b) - Audit Controls
+
+### Rollback Instructions
+If security fixes cause system instability:
+\`\`\`bash
+/snapshot --restore before-security-audit-YYYYMMDD-HHMMSS
+# Or: git checkout tags/snapshot-before-security-audit-YYYYMMDD-HHMMSS
+\`\`\`
+
+### Audit Trail
+This snapshot is logged in .claude/agents/agents.md for compliance auditing.
+Retention: 90 days (security audit snapshots)
+```
+
+### Compliance Justification
+
+**Why snapshots are required for security audits**:
+- **HIPAA §164.312(b)**: Audit controls require ability to review and restore
+- **SOC 2 CC6.1**: Change control requires rollback capability
+- **NIST CSF PR.IP-3**: Configuration change control requires backups
+- **Risk Mitigation**: Security fixes may introduce regressions
+
 ## Core Responsibilities
 
 ### 1. Security Vulnerability Assessment

@@ -2,6 +2,21 @@
 
 Delegate code review tasks to the specialized code-reviewer agent.
 
+## Safety Consideration
+
+If the review will suggest significant refactoring (detected during initial analysis), recommend creating a snapshot:
+
+```
+💡 Large refactoring suggested - create snapshot first?
+/snapshot "pre-review-refactor" --branch
+```
+
+Consider snapshot if:
+- Review scope includes >20 files
+- Architectural changes likely
+- Security fixes that may require extensive changes
+- Major code style/pattern updates
+
 ## Task Delegation
 
 Use the Task tool to invoke the code-reviewer agent with subagent_type='general-purpose':

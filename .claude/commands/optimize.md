@@ -2,6 +2,21 @@
 
 Delegate code optimization analysis to the specialized optimizer agent.
 
+## Safety First
+
+**IMPORTANT**: Before running optimization, suggest creating a snapshot:
+
+```
+💡 Tip: Create snapshot before optimization?
+/snapshot "pre-optimization" --branch
+```
+
+If user hasn't created a snapshot recently, prompt:
+- Show current git status
+- Recommend creating snapshot for safety
+- Explain that optimization can involve significant changes
+- Wait for confirmation before proceeding
+
 ## Task Delegation
 
 Use the Task tool to invoke the optimizer agent with subagent_type='general-purpose':
